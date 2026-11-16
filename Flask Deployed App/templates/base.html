@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap 5 + Icons + Font -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <title>{% block pagetitle %}{% endblock pagetitle %} | PlantCare AI</title>
+
+    <style>
+        :root {
+            --green-900: #052e16;
+            --green-800: #14532d;
+            --green-700: #15803d;
+            --green-600: #16a34a;
+            --green-500: #22c55e;
+            --green-100: #dcfce7;
+            --green-50: #f0fdf4;
+            --text: #1f2937;
+            --muted: #6b7280;
+        }
+
+        * { font-family: 'Poppins', sans-serif; }
+
+        html, body { min-height: 100%; }
+
+        body {
+            color: var(--text);
+            background: linear-gradient(180deg, var(--green-50) 0%, #ffffff 60%);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        main { flex: 1; }
+
+        /* ---------- Navbar ---------- */
+        .navbar-glass {
+            background: rgba(5, 46, 22, 0.92);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, .12);
+        }
+        .navbar-brand { font-weight: 700; letter-spacing: .3px; }
+        .navbar-brand .bi { color: var(--green-500); }
+        .navbar .nav-link {
+            color: rgba(255, 255, 255, .8) !important;
+            font-weight: 500;
+            padding: .5rem 1rem !important;
+            border-radius: 999px;
+            transition: all .2s ease;
+        }
+        .navbar .nav-link:hover,
+        .navbar .nav-link.active {
+            color: #fff !important;
+            background: rgba(34, 197, 94, .2);
+        }
+
+        /* ---------- Shared ---------- */
+        .page-header {
+            padding: 3.5rem 0 2rem;
+            text-align: center;
+        }
+        .page-header h1 {
+            font-weight: 800;
+            color: var(--green-900);
+            font-size: clamp(2rem, 4vw, 3rem);
+        }
+        .page-header p { color: var(--muted); font-size: 1.1rem; }
+
+        .gradient-text {
+            background: linear-gradient(90deg, var(--green-700), var(--green-500));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .card-soft {
+            background: #fff;
+            border: 1px solid rgba(22, 163, 74, .1);
+            border-radius: 1.25rem;
+            box-shadow: 0 10px 30px rgba(5, 46, 22, .06);
+            transition: transform .25s ease, box-shadow .25s ease;
+            height: 100%;
+        }
+        .card-soft:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 40px rgba(5, 46, 22, .12);
+        }
+
+        .btn-green {
+            background: linear-gradient(135deg, var(--green-600), var(--green-700));
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            padding: .7rem 1.6rem;
+            font-weight: 600;
+            box-shadow: 0 8px 20px rgba(22, 163, 74, .3);
+            transition: all .2s ease;
+        }
+        .btn-green:hover {
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(22, 163, 74, .4);
+        }
+        .btn-outline-green {
+            border: 2px solid var(--green-600);
+            color: var(--green-700);
+            border-radius: 999px;
+            padding: .6rem 1.4rem;
+            font-weight: 600;
+            background: transparent;
+            transition: all .2s ease;
+        }
+        .btn-outline-green:hover { background: var(--green-600); color: #fff; }
+
+        .icon-badge {
+            width: 52px; height: 52px;
+            border-radius: 14px;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: var(--green-100);
+            color: var(--green-700);
+            font-size: 1.5rem;
+        }
+
+        .fade-up { animation: fadeUp .6s ease both; }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ---------- Footer ---------- */
+        .site-footer {
+            background: var(--green-900);
+            color: rgba(255, 255, 255, .8);
+            padding: 2.5rem 0 1.5rem;
+            margin-top: 4rem;
+        }
+        .site-footer a { color: rgba(255, 255, 255, .75); text-decoration: none; transition: color .2s; }
+        .site-footer a:hover { color: var(--green-500); }
+        .made-with {
+            display: inline-flex; align-items: center; gap: .4rem;
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid rgba(255, 255, 255, .12);
+            padding: .55rem 1.2rem;
+            border-radius: 999px;
+            font-weight: 500;
+            color: #fff;
+        }
+        .made-with .heart { color: #ef4444; animation: beat 1.2s infinite; display: inline-block; }
+        .made-with strong { color: var(--green-500); }
+        @keyframes beat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.25); }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-glass sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="bi bi-flower1"></i> PlantCare AI</a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto gap-1">
+                    <li class="nav-item"><a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/"><i class="bi bi-house-door me-1"></i>Home</a></li>
+                    <li class="nav-item"><a class="nav-link {% if request.path in ['/index', '/submit'] %}active{% endif %}" href="/index"><i class="bi bi-cpu me-1"></i>AI Engine</a></li>
+                    <li class="nav-item"><a class="nav-link {% if request.path == '/market' %}active{% endif %}" href="/market"><i class="bi bi-bag me-1"></i>Supplements</a></li>
+                    <li class="nav-item"><a class="nav-link {% if request.path == '/contact' %}active{% endif %}" href="/contact"><i class="bi bi-person me-1"></i>Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        {% block body %}{% endblock body %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="container text-center">
+            <a class="navbar-brand text-white fs-4 d-inline-block mb-3" href="/"><i class="bi bi-flower1 text-success"></i> PlantCare AI</a>
+            <ul class="list-inline mb-4">
+                <li class="list-inline-item mx-2"><a href="/">Home</a></li>
+                <li class="list-inline-item mx-2"><a href="/index">AI Engine</a></li>
+                <li class="list-inline-item mx-2"><a href="/market">Supplements</a></li>
+                <li class="list-inline-item mx-2"><a href="/contact">Contact</a></li>
+            </ul>
+            <div class="made-with mb-3">
+                Made with <span class="heart">&#10084;</span> by <strong>Avinash</strong>
+            </div>
+            <p class="small mb-0" style="color: rgba(255,255,255,.5);">&copy; 2026 PlantCare AI &middot; Plant Disease Detection using Deep Learning (CNN)</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% block pagetitle %}AI Engine{% endblock pagetitle %}
+
+{% block body %}
+<style>
+    .dropzone {
+        border: 2.5px dashed rgba(22, 163, 74, .4);
+        border-radius: 1.25rem;
+        background: var(--green-50);
+        padding: 2.2rem 1rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all .2s ease;
+    }
+    .dropzone:hover, .dropzone.dragover {
+        border-color: var(--green-600);
+        background: var(--green-100);
+    }
+    .dropzone .bi { font-size: 3rem; color: var(--green-600); }
+    #preview {
+        max-height: 260px; width: 100%; object-fit: contain;
+        border-radius: 1rem; display: none; margin-top: 1rem;
+        background: #f9fafb;
+    }
+    #camera-container { display: none; }
+    #camera-feed { width: 100%; border-radius: 1rem; background: #000; }
+    .file-name {
+        display: inline-flex; align-items: center; gap: .4rem;
+        background: var(--green-100); color: var(--green-800);
+        padding: .35rem .9rem; border-radius: 999px; font-size: .9rem; font-weight: 500;
+    }
+    .info-list li { margin-bottom: .6rem; display: flex; gap: .6rem; }
+    .info-list li .bi { color: var(--green-600); }
+    #loading-overlay {
+        position: fixed; inset: 0; background: rgba(5, 46, 22, .85);
+        display: none; align-items: center; justify-content: center; flex-direction: column;
+        color: #fff; z-index: 2000;
+    }
+</style>
+
+<div class="container">
+    <div class="page-header fade-up">
+        <h1><i class="bi bi-cpu"></i> AI <span class="gradient-text">Engine</span></h1>
+        <p>Upload or capture a leaf image and let AI detect the disease for you</p>
+        {% if error %}
+        <div class="alert alert-danger d-inline-block rounded-pill px-4 mt-2"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>
+        {% endif %}
+        {% if demo_mode %}
+        <div class="alert alert-warning d-inline-block rounded-pill px-4 mt-2 small mb-0">
+            <i class="bi bi-info-circle me-1"></i>Demo Mode: AI model not loaded on this server &mdash; try images from the <b>test_images</b> folder.
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="row g-4">
+        <!-- Upload panel (first on mobile) -->
+        <div class="col-lg-5 order-lg-2 fade-up">
+            <div class="card-soft p-4 p-md-5">
+                <form id="upload-form" action="/submit" method="POST" enctype="multipart/form-data">
+                    <input type="file" id="actual-btn" name="image" accept="image/*" hidden />
+
+                    <div id="dropzone" class="dropzone">
+                        <i class="bi bi-cloud-arrow-up"></i>
+                        <h5 class="fw-bold mt-2 mb-1">Drag &amp; drop leaf image</h5>
+                        <p class="text-muted mb-0">or click to browse your files</p>
+                    </div>
+
+                    <div class="d-flex flex-wrap justify-content-center gap-2 mt-3">
+                        <button type="button" class="btn btn-outline-green" id="choose-btn"><i class="bi bi-folder2-open me-1"></i>Choose File</button>
+                        <button type="button" class="btn btn-outline-green" id="camera-btn"><i class="bi bi-camera me-1"></i>Open Camera</button>
+                    </div>
+
+                    <div id="camera-container" class="mt-3 text-center">
+                        <video id="camera-feed" autoplay playsinline></video>
+                        <div class="d-flex justify-content-center gap-2 mt-2">
+                            <button type="button" class="btn btn-green" id="capture-btn"><i class="bi bi-camera-fill me-1"></i>Capture</button>
+                            <button type="button" class="btn btn-outline-secondary rounded-pill" id="close-camera-btn">Close</button>
+                        </div>
+                    </div>
+
+                    <img id="preview" src="#" alt="Selected leaf preview" />
+
+                    <div class="text-center mt-3">
+                        <span id="file-chosen" class="file-name"><i class="bi bi-image"></i> No file chosen</span>
+                    </div>
+
+                    <p class="text-center text-muted small mt-3 mb-4">Simply upload your plant's leaf image and see the magic of AI ✨</p>
+
+                    <button type="submit" class="btn btn-green w-100 py-3"><i class="bi bi-search me-2"></i>Detect Disease</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-3 order-lg-1 fade-up" style="animation-delay:.1s">
+            <div class="card-soft p-4">
+                <span class="icon-badge mb-3"><i class="bi bi-question-circle"></i></span>
+                <h5 class="fw-bold">Why detect plant disease?</h5>
+                <p class="text-muted mb-0" style="font-size:.95rem;">Plant diseases affect the growth of their species.
+                    Proper identification of the disease and its cause is essential &mdash; without it, control measures
+                    can waste time and money and lead to further plant losses. Early, accurate diagnosis saves crops.</p>
+            </div>
+        </div>
+
+        <div class="col-lg-4 order-lg-3 fade-up" style="animation-delay:.2s">
+            <div class="card-soft p-4">
+                <span class="icon-badge mb-3"><i class="bi bi-shield-check"></i></span>
+                <h5 class="fw-bold">Prevent plant disease</h5>
+                <ul class="list-unstyled info-list mt-3" style="font-size:.95rem;">
+                    <li><i class="bi bi-check2-circle"></i> Follow good sanitation practices</li>
+                    <li><i class="bi bi-check2-circle"></i> Fertilize to keep plants healthy</li>
+                    <li><i class="bi bi-check2-circle"></i> Inspect plants before bringing them home</li>
+                    <li><i class="bi bi-check2-circle"></i> Allow the soil to warm before planting</li>
+                    <li><i class="bi bi-check2-circle"></i> Rotate crops regularly</li>
+                    <li><i class="bi bi-check2-circle"></i> Provide good air circulation</li>
+                    <li><i class="bi bi-check2-circle"></i> Remove diseased stems and foliage</li>
+                </ul>
+                <a target="_blank" href="https://www.thespruce.com/prevent-plant-diseases-in-your-garden-2539511"
+                    class="btn btn-outline-green btn-sm">More info <i class="bi bi-box-arrow-up-right ms-1"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="loading-overlay">
+    <div class="spinner-border text-success mb-3" style="width:4rem;height:4rem;" role="status"></div>
+    <h4 class="fw-bold">Analysing your leaf...</h4>
+    <p class="opacity-75">Our AI is detecting the disease 🌿</p>
+</div>
+
+<script>
+    const fileInput = document.getElementById('actual-btn');
+    const dropzone = document.getElementById('dropzone');
+    const fileChosen = document.getElementById('file-chosen');
+    const preview = document.getElementById('preview');
+    const cameraContainer = document.getElementById('camera-container');
+    const cameraFeed = document.getElementById('camera-feed');
+    let stream = null;
+
+    function showFile(file) {
+        fileChosen.innerHTML = '<i class="bi bi-check-circle-fill"></i> ' + file.name;
+        const reader = new FileReader();
+        reader.onload = e => { preview.src = e.target.result; preview.style.display = 'block'; };
+        reader.readAsDataURL(file);
+    }
+
+    function setFile(file) {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        fileInput.files = dt.files;
+        showFile(file);
+    }
+
+    dropzone.addEventListener('click', () => fileInput.click());
+    document.getElementById('choose-btn').addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', () => { if (fileInput.files[0]) showFile(fileInput.files[0]); });
+
+    ['dragenter', 'dragover'].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.add('dragover'); }));
+    ['dragleave', 'drop'].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.remove('dragover'); }));
+    dropzone.addEventListener('drop', e => {
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) setFile(file);
+    });
+
+    function stopCamera() {
+        if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+        cameraContainer.style.display = 'none';
+    }
+
+    document.getElementById('camera-btn').addEventListener('click', async () => {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+            cameraFeed.srcObject = stream;
+            cameraContainer.style.display = 'block';
+        } catch (err) {
+            alert('Unable to access the camera: ' + err.message);
+        }
+    });
+
+    document.getElementById('close-camera-btn').addEventListener('click', stopCamera);
+
+    document.getElementById('capture-btn').addEventListener('click', () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = cameraFeed.videoWidth;
+        canvas.height = cameraFeed.videoHeight;
+        canvas.getContext('2d').drawImage(cameraFeed, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(blob => {
+            setFile(new File([blob], 'camera_image_' + Date.now() + '.jpg', { type: 'image/jpeg' }));
+            stopCamera();
+        }, 'image/jpeg', 0.95);
+    });
+
+    document.getElementById('upload-form').addEventListener('submit', e => {
+        if (!fileInput.files.length) {
+            e.preventDefault();
+            alert('Please choose or capture a leaf image first.');
+            return;
+        }
+        if (fileInput.files[0].size > 4 * 1024 * 1024) {
+            e.preventDefault();
+            alert('Image is too large. Please upload an image under 4 MB.');
+            return;
+        }
+        document.getElementById('loading-overlay').style.display = 'flex';
+    });
+</script>
+{% endblock body %}

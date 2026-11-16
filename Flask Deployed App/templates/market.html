@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block pagetitle %}Supplement Market{% endblock pagetitle %}
+
+{% block body %}
+<style>
+    .supp-card { display: flex; flex-direction: column; text-align: center; }
+    .supp-card .img-box {
+        height: 200px; display: flex; align-items: center; justify-content: center;
+        background: #f9fafb; border-radius: 1rem; margin-bottom: 1rem;
+    }
+    .supp-card .img-box img { max-height: 180px; max-width: 90%; object-fit: contain; }
+    .supp-card .disease { font-weight: 600; color: var(--green-900); font-size: .95rem; }
+    .supp-card .sname { color: var(--muted); font-size: .88rem; flex: 1; }
+    .filter-btn.active { background: var(--green-600); color: #fff; }
+</style>
+
+<div class="container">
+    <div class="page-header fade-up">
+        <h1><i class="bi bi-bag-heart"></i> <span class="gradient-text">Supplements</span> Market</h1>
+        <p>Buy supplements &amp; fertilizers for your crops &mdash; all at one place</p>
+        <div class="d-flex justify-content-center gap-2 mt-3">
+            <button class="btn btn-outline-green filter-btn active" data-filter="all">All</button>
+            <button class="btn btn-outline-green filter-btn" data-filter="diseased">Supplements</button>
+            <button class="btn btn-outline-green filter-btn" data-filter="healthy">Fertilizers</button>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {% for index in range(0, supplement_name | length) %}
+        {% if index != 4 %}
+        {% set healthy = index in [3, 5, 7, 11, 15, 18, 20, 23, 24, 25, 28, 38] %}
+        <div class="col-sm-6 col-lg-4 col-xl-3 supp-item" data-type="{% if healthy %}healthy{% else %}diseased{% endif %}">
+            <div class="card-soft supp-card p-4">
+                <div class="mb-2">
+                    {% if healthy %}
+                    <span class="badge rounded-pill bg-success-subtle text-success px-3 py-2"><i class="bi bi-flower2 me-1"></i>Fertilizer &middot; Healthy</span>
+                    {% else %}
+                    <span class="badge rounded-pill bg-danger-subtle text-danger px-3 py-2"><i class="bi bi-capsule me-1"></i>Supplement &middot; Diseased</span>
+                    {% endif %}
+                </div>
+                <div class="img-box"><img src="{{supplement_image[index]}}" alt="{{supplement_name[index]}}" loading="lazy"></div>
+                <p class="disease mb-1">For {{disease[index]}}</p>
+                <p class="sname">{{supplement_name[index]}}</p>
+                <a target="_blank" href="{{buy[index]}}" class="btn btn-green btn-sm mt-2"><i class="bi bi-cart3 me-1"></i>Buy Product</a>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const f = btn.dataset.filter;
+            document.querySelectorAll('.supp-item').forEach(item => {
+                item.style.display = (f === 'all' || item.dataset.type === f) ? '' : 'none';
+            });
+        });
+    });
+</script>
+{% endblock body %}

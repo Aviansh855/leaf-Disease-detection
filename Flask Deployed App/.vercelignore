@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.pt
+static/uploads/
+requirements-ml.txt
+Procfile
+

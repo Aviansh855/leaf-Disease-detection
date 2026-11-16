@@ -1,0 +1,11 @@
+# Full requirements for running the REAL AI model locally / on a server with enough space
+# (Render, Hugging Face Spaces, a VPS...). Needs 64-bit Python.
+#   pip install -r requirements-ml.txt
+Flask>=3.0,<4
+gunicorn
+numpy
+Pillow
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
+torchvision
+
